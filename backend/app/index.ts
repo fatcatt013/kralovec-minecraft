@@ -1,21 +1,29 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { main } from './db_index'
+import { listDatabases,  useDb } from './db_index';
+const cors = require('cors');
 
 const USER: string = "admin";
 const PWD: string = "admin";
-
-main(USER, PWD).catch(console.error);
- 
-dotenv.config();
+const port: string = '6000';
 
 const app = express();
-const port = 5000;
 
-app.get('/', (req, res) => {
-  res.send('Express + TypeScript Server');
-});
+dotenv.config();
+app.use(cors());
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at https://localhost:${port}`);
-});
+const initBackend = async () => {
+
+  app.get('/api/', async (req, res) => {
+    console.log("Test working")
+    let dbList = await useDb(USER, PWD, listDatabases);
+    console.log(dbList);
+    res.send(dbList);
+  });
+  
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at https://localhost:${port}`);
+  });
+}
+
+initBackend();

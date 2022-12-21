@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = void 0;
+exports.useDb = exports.listDatabases = void 0;
 const { MongoClient } = require('mongodb');
 function listDatabases(client) {
     return __awaiter(this, void 0, void 0, function* () {
         let databasesList = yield client.db().admin().listDatabases();
-        console.log("Databases:");
-        databasesList.databases.forEach((db) => console.log(` - ${db.name}`));
+        return databasesList.databases;
     });
 }
+exports.listDatabases = listDatabases;
 ;
-function main(USER, PWD) {
+function useDb(USER, PWD, cb) {
     return __awaiter(this, void 0, void 0, function* () {
         const uri = `mongodb://${USER}:${PWD}@localhost/kralovec-minecraft`;
         const client = new MongoClient(uri);
@@ -30,14 +30,12 @@ function main(USER, PWD) {
                     console.log(err);
                 }
             });
-            yield listDatabases(client);
+            let list = yield cb(client);
+            return list;
         }
         catch (e) {
             console.error(e);
         }
-        finally {
-            yield client.close();
-        }
     });
 }
-exports.main = main;
+exports.useDb = useDb;

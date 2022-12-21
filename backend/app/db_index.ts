@@ -1,13 +1,11 @@
 const { MongoClient } = require('mongodb');
 
-async function listDatabases(client: any){
+export async function listDatabases(client: any){
     let databasesList = await client.db().admin().listDatabases();
- 
-    console.log("Databases:");
-    databasesList.databases.forEach((db:any) => console.log(` - ${db.name}`));
+    return databasesList.databases
 };
 
-export async function main(USER: string, PWD: string){
+export async function useDb(USER: string, PWD: string, cb: any){
 
     const uri: string = `mongodb://${USER}:${PWD}@localhost/kralovec-minecraft`;
   
@@ -21,11 +19,10 @@ export async function main(USER: string, PWD: string){
             }
             
         });
-        await listDatabases(client);
+        let list = await cb(client);
+        return list;
   
     } catch (e) {
         console.error(e);
-    } finally {
-        await client.close();
-    }
+    } 
   }
